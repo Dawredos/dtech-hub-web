@@ -366,7 +366,20 @@ export default function App() {
                   desc: 'Penyerahan Medali Perak dan Sertifikat Juara 2 Membawa Nama Sekolah oleh Waka Kurikulum Tahun 2025', 
                   img: '/src/assets/upacara.jpeg' 
                 },
-                
+                { 
+                  id: 5, 
+                  icon: '🥇', 
+                  title: 'RANKING 1 & 2', 
+                  desc: 'Berhasil Mempertahankan Nilai Ranking 1 & 2 dari 42 Siswa/Siswi Jurusan TJKT Tahun Ajaran 2023-2026', 
+                  img: '/src/assets/rangking.jpeg' 
+                },
+                { 
+                  id: 6, 
+                  icon: '🥇', 
+                  title: 'PELATIHAN DESAIN', 
+                  desc: 'Pelatihan Desain Grafis yang Diselenggarakan oleh PR IPM Smk Muhammadiyah 1 Pringsewu Tahun 2023', 
+                  img: '/src/assets/desain.jpeg' 
+                },
                 { 
                   id: 7, 
                   icon: '🥇', 
