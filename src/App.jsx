@@ -18,6 +18,9 @@ export default function App() {
   ]);
   const [inputChat, setInputChat] = useState('');
 
+  // FITUR BARU: State pilihan mode layout (null = belum milih, disuruh milih dulu)
+  const [layoutMode, setLayoutMode] = useState(null);
+
   useEffect(() => {
     if (showNetworkModal) {
       fetch('https://api.ipify.org?format=json')
@@ -98,7 +101,7 @@ export default function App() {
       const msgLower = userMsg.toLowerCase();
 
       if (msgLower.includes('servis') || msgLower.includes('service') || msgLower.includes('rusak') || msgLower.includes('hp')) {
-        botReply = "DTECH HUB melayani servis hardware (ganti LCD, baterai, ic, dll) dan juga optimasi software PC/Laptop. Langsung klik tombol WhatsApp di bawah buat booking, gratis konsultasi! 🛠️";
+        botReply = "DTECH HUB melayani servis hardware (ganti LCD, baterai, ic, dll) and juga optimasi software PC/Laptop. Langsung klik tombol WhatsApp di bawah buat booking, gratis konsultasi! 🛠️";
       } else if (msgLower.includes('harga') || msgLower.includes('biaya') || msgLower.includes('berapa')) {
         botReply = "Biaya bervariasi tergantung kerusakan. Tapi tenang aja, pengerjaan di DTECH HUB dijamin transparan, presisi, dan ramah di kantong pelajar/mahasiswa! 💸";
       } else if (msgLower.includes('lokasi') || msgLower.includes('alamat') || msgLower.includes('dimana')) {
@@ -111,9 +114,80 @@ export default function App() {
     }, 800);
   };
 
+  // Fungsi helper untuk menentukan grid kolom berdasarkan mode yang dipilih user
+  const getGridStyle = () => {
+    if (layoutMode === 'computer') {
+      return { gridTemplateColumns: '1.2fr 0.8fr', padding: '0 10%', gap: '40px' };
+    }
+    if (layoutMode === 'tablet') {
+      return { gridTemplateColumns: '1.1fr 0.9fr', padding: '0 5%', gap: '20px' };
+    }
+    if (layoutMode === 'phone') {
+      return { gridTemplateColumns: '1fr', padding: '0 5%', gap: '30px' };
+    }
+    return { gridTemplateColumns: window.innerWidth > 768 ? '1.2fr 0.8fr' : '1fr', padding: '0 10%', gap: '40px' };
+  };
+
   return (
     <div className="min-h-screen bg-[#F9FAFB] overflow-x-hidden selection:bg-purple-100 font-sans">
       
+      {/* SCREEN SELECTOR (EFEK TRANSPARAN BLUR PREMIUM) */}
+      <AnimatePresence>
+        {!layoutMode && (
+          <motion.div 
+            initial={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-xl text-white p-6"
+          >
+            <motion.h2 
+              initial={{ y: -20 }} 
+              animate={{ y: 0 }} 
+              className="text-3xl md:text-4xl font-black tracking-tighter mb-2 text-center drop-shadow-md"
+            >
+              WELCOME TO <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] to-[#6D28D9]">DTECH HUB</span>
+            </motion.h2>
+            <p className="text-gray-200 text-xs md:text-sm font-mono uppercase tracking-widest mb-10 text-center drop-shadow-sm">
+              Silahkan pilih mode tampilan device untuk simulasi layout:
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-6 w-full max-w-3xl justify-center items-center">
+              {/* Tombol HP */}
+              <motion.button 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setLayoutMode('phone')}
+                className="bg-slate-900/40 backdrop-blur-md border border-white/10 hover:border-blue-500 w-full sm:w-48 h-40 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all group shadow-2xl"
+              >
+                <span className="text-4xl group-hover:animate-bounce">📱</span>
+                <span className="font-bold tracking-wider text-sm">LAYOUT HP</span>
+              </motion.button>
+
+              {/* Tombol Tablet */}
+              <motion.button 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setLayoutMode('tablet')}
+                className="bg-slate-900/40 backdrop-blur-md border border-white/10 hover:border-purple-500 w-full sm:w-48 h-40 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all group shadow-2xl"
+              >
+                <span className="text-4xl group-hover:animate-bounce">📟</span>
+                <span className="font-bold tracking-wider text-sm">LAYOUT TABLET</span>
+              </motion.button>
+
+              {/* Tombol Komputer */}
+              <motion.button 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setLayoutMode('computer')}
+                className="bg-slate-900/40 backdrop-blur-md border border-white/10 hover:border-emerald-500 w-full sm:w-48 h-40 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all group shadow-2xl"
+              >
+                <span className="text-4xl group-hover:animate-bounce">🖥️</span>
+                <span className="font-bold tracking-wider text-sm">LAYOUT KOMPUTER</span>
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <svg className="hidden">
         <defs>
           <filter id="liquid-goo">
@@ -134,6 +208,16 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-4 md:gap-8 font-bold text-[10px] md:text-[11px] uppercase tracking-widest text-[#1F2937]/70">
+          
+          {layoutMode && (
+            <button 
+              onClick={() => setLayoutMode(null)}
+              className="text-[9px] bg-gray-200 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-300 transition"
+            >
+              🔄 GANTI DEVICE ({layoutMode})
+            </button>
+          )}
+
           <a href="#about" className="hover:text-[#2563EB] transition-all">About</a>
 
           <button 
@@ -224,27 +308,26 @@ export default function App() {
             <section 
               style={{ 
                 display: 'grid', 
-                gridTemplateColumns: window.innerWidth > 768 ? '1.2fr 0.8fr' : '1fr', 
                 alignItems: 'center', 
                 minHeight: '100vh', 
-                padding: '0 10%', 
-                gap: '40px' 
+                ...getGridStyle() 
               }}
               className="relative pt-24"
             >
-              <div className="z-10 text-left">
+              {/* Bagian Kiri: Teks */}
+              <div className={`z-10 ${layoutMode === 'phone' ? 'text-center flex flex-col items-center' : 'text-left'}`}>
                 <span className="inline-block px-4 py-1 rounded-full bg-purple-50 text-[#6D28D9] text-[10px] font-bold mb-6 tracking-[0.2em] uppercase border border-purple-100">
                   Tech Analyst Pringsewu
                 </span>
-                <h1 className="text-6xl md:text-[8rem] font-[1000] text-[#1F2937] leading-[0.85] tracking-tighter">
-                  IT <br /> 
+                <h1 className={`${layoutMode === 'phone' ? 'text-4xl' : layoutMode === 'tablet' ? 'text-5xl' : 'text-6xl md:text-[8rem]'} font-[1000] text-[#1F2937] leading-[0.85] tracking-tighter`}>
+                  IT {layoutMode === 'phone' ? ' ' : <br />} 
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] via-[#6D28D9] to-indigo-600">SERVICES.</span>
                 </h1>
                 <p className="mt-8 text-lg text-[#1F2937]/60 max-w-md font-medium leading-relaxed">
                   Adalah pokoknya, kalo ada apa apa tentang keluhan gadget barangkali bisa konsultasi, btw untuk konsultasi free dong bisa hubungi kontak yang tersedia, atau kepoin pencapaian gue bisa liat project yang masih di kembangkan ini...🤭
                 </p>
                 
-                <div className="flex flex-wrap gap-6 mt-10 justify-start items-center">
+                <div className={`flex flex-wrap gap-6 mt-10 ${layoutMode === 'phone' ? 'justify-center' : 'justify-start'} items-center`}>
                   <div style={{ filter: 'url(#liquid-goo)' }} className="relative flex items-center">
                     <motion.button 
                       onClick={() => setShowProjects(true)}
@@ -258,7 +341,8 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flex justify-end items-center relative mt-12 md:mt-0">
+              {/* Bagian Kanan: Kartu Profil */}
+              <div className={`flex ${layoutMode === 'phone' ? 'justify-center mt-6' : 'justify-end'} items-center relative mt-12 md:mt-0`}>
                 <div className="absolute w-80 h-80 bg-purple-400/10 blur-[120px] rounded-full animate-pulse"></div>
                 <motion.div 
                   animate={{ y: [0, +58, 0], rotateZ: [0, 8, -7, 0] }} 
@@ -338,85 +422,18 @@ export default function App() {
 
             <div className="flex flex-col gap-20 max-w-6xl w-full pb-32">
               {[
-                { 
-                  id: 1, 
-                  icon: '✨', 
-                  title: 'LULUS COY 😹😭😭', 
-                  desc: 'Bangga Menjadi Alumni SMKS Muhammadiyah 1 Pringsewu dengan Menerapkan Prinsip Nilai Moral dan Keagamaan serta Skill sesuai dengan Kompetensi yang dimiliki Tahun 2023-2026', 
-                  img: '/src/assets/lulus.jpeg' 
-                },
-                { 
-                  id: 2, 
-                  icon: '🥇', 
-                  title: 'PORSIKAM II SE-LAMPUNG', 
-                  desc: 'Juara 2 Lomba Desain Poster dalam Event Official PORSIKAM Muhammadiyah se-Provinsi Lampung Tahun 2025', 
-                  img: '/src/assets/porsikam.jpeg' 
-                },
-                { 
-                  id: 3, 
-                  icon: '🥇', 
-                  title: 'ITC TOEIC CERTIFICATION', 
-                  desc: 'Sertifikasi Internasional Bahasa Inggris TOEIC Terverifikasi Diselenggarakan oleh Direktorat SMK Tahun 2025', 
-                  img: '/src/assets/toeic.jpeg' 
-                },
-                { 
-                  id: 4, 
-                  icon: '🥇', 
-                  title: 'JUARA 2 DESAIN POSTER', 
-                  desc: 'Penyerahan Medali Perak dan Sertifikat Juara 2 Membawa Nama Sekolah oleh Waka Kurikulum Tahun 2025', 
-                  img: '/src/assets/upacara.jpeg' 
-                },
-                
-                { 
-                  id: 7, 
-                  icon: '🥇', 
-                  title: 'SCIENCE LABOLATORY CHALLENGE', 
-                  desc: 'Lomba Challenge Sience saat di Madrasah Tsanawiyah Pringsewu Juara 3, Fotonya ini blur karena difoto dengan hp jadul Tahun 2020', 
-                  img: '/src/assets/ipa.jpeg' 
-                },
-                { 
-                  id: 8, 
-                  icon: '🥇', 
-                  title: 'E|HE Certification', 
-                  desc: 'Pencapaian Sertifikat Internasional Course Junior Cybersecurity yang Diselenggarakan oleh EC-Council Tahun 2024', 
-                  img: '/src/assets/ehe.jpeg' 
-                },
-                { 
-                  id: 9, 
-                  icon: '☪', 
-                  title: 'ISRA MIʾRAJ 2025', 
-                  desc: 'Kultum Singkat mengenai Materi Isra Miʾraj di SMK Muhammadiyah 1 Pringsewu Tahun 2025', 
-                  img: '/src/assets/islam.jpeg' 
-                },
-                { 
-                  id: 10, 
-                  icon: '🏔', 
-                  title: 'TEKTOK 1662 MDPL', 
-                  desc: 'Tektok MT.PESAWARAN Dengan Ketinggian 1662 Mdpl Minimal Sekali Seumur Hidup lah ya FOMO Tahun 2025 🤭', 
-                  img: '/src/assets/muncak.jpeg' 
-                },
-                { 
-                  id: 11, 
-                  icon: '📽', 
-                  title: 'PROJECT LAST CEREMONY', 
-                  desc: 'Membuka Project untuk Menawarkan Jasa Konten Cinematic Upacara Terakhir di Sekolah bersama Rekan Tim Tahun 2026', 
-                  img: '/src/assets/foto.jpeg' 
-                },
-                { 
-                  id: 12, 
-                  icon: '🖥', 
-                  title: 'PROJECT TECHNICIAN', 
-                  desc: 'Membuka Project Usaha untuk Menawarkan Jasa Servis dan Maintenance Device Gadget Handphone, Komputer, atau Laptop dengan harga terjangkau tahun 2023', 
-                  img: '/src/assets/servis.jpeg' 
-                },
-                { 
-                  id: 13, 
-                  icon: '🌐', 
-                  title: 'PROJECT NETWORKING', 
-                  desc: 'Implementasi Konfigurasi Data Server, MikroTik & Cisco optimisasi keamanan jaringan dan server monitoring.', 
-                  img: '/src/assets/jaringan.jpeg' 
-                },
-              ].map((project, idx) => (
+                { id: 1, icon: '✨', title: 'LULUS COY 😹😭😭', desc: 'Bangga Menjadi Alumni SMKS Muhammadiyah 1 Pringsewu dengan Menerapkan Prinsip Nilai Moral dan Keagamaan serta Skill sesuai dengan Kompetensi yang dimiliki Tahun 2023-2026', img: '/src/assets/lulus.jpeg' },
+                { id: 2, icon: '🥇', title: 'PORSIKAM II SE-LAMPUNG', desc: 'Juara 2 Lomba Desain Poster dalam Event Official PORSIKAM Muhammadiyah se-Provinsi Lampung Tahun 2025', img: '/src/assets/porsikam.jpeg' },
+                { id: 3, icon: '🥇', title: 'ITC TOEIC CERTIFICATION', desc: 'Sertifikasi Internasional Bahasa Inggris TOEIC Terverifikasi Diselenggarakan oleh Direktorat SMK Tahun 2025', img: '/src/assets/toeic.jpeg' },
+                { id: 4, icon: '🥇', title: 'JUARA 2 DESAIN POSTER', desc: 'Penyerahan Medali Perak dan Sertifikat Juara 2 Membawa Nama Sekolah oleh Waka Kurikulum Tahun 2025', img: '/src/assets/upacara.jpeg' },
+                { id: 7, icon: '🥇', title: 'SCIENCE LABOLATORY CHALLENGE', desc: 'Lomba Challenge Sience saat di Madrasah Tsanawiyah Pringsewu Juara 3, Fotonya ini blur karena difoto dengan hp jadul Tahun 2020', img: '/src/assets/ipa.jpeg' },
+                { id: 8, icon: '🥇', title: 'E|HE Certification', desc: 'Pencapaian Sertifikat Internasional Course Junior Cybersecurity yang Diselenggarakan oleh EC-Council Tahun 2024', img: '/src/assets/ehe.jpeg' },
+                { id: 9, icon: '☪', title: 'ISRA MIʾRAJ 2025', desc: 'Kultum Singkat mengenai Materi Isra Miʾraj di SMK Muhammadiyah 1 Pringsewu Tahun 2025', img: '/src/assets/islam.jpeg' },
+                { id: 10, icon: '🏔', title: 'TEKTOK 1662 MDPL', desc: 'Tektok MT.PESAWARAN Dengan Ketinggian 1662 Mdpl Minimal Sekali Seumur Hidup lah ya FOMO Tahun 2025 🤭', img: '/src/assets/muncak.jpeg' },
+                { id: 11, icon: '📽', title: 'PROJECT LAST CEREMONY', desc: 'Membuka Project untuk Menawarkan Jasa Konten Cinematic Upacara Terakhir di Sekolah bersama Rekan Tim Tahun 2026', img: '/src/assets/foto.jpeg' },
+                { id: 12, icon: '🖥', title: 'PROJECT TECHNICIAN', desc: 'Membuka Project Usaha untuk Menawarkan Jasa Servis dan Maintenance Device Gadget Handphone, Komputer, atau Laptop dengan harga terjangkau tahun 2023', img: '/src/assets/servis.jpeg' },
+                { id: 13, icon: '🌐', title: 'PROJECT NETWORKING', desc: 'Implementasi Konfigurasi Data Server, MikroTik & Cisco optimisasi keamanan jaringan dan server monitoring.', img: '/src/assets/jaringan.jpeg' },
+              ].map((project) => (
                 <motion.div 
                   key={project.id}
                   initial={{ opacity: 0, y: 50 }}
@@ -435,9 +452,7 @@ export default function App() {
                       className="w-full h-full object-cover"
                       onError={(e) => { e.target.src = "https://via.placeholder.com/1200x800?text=DTECH+HUB+BIG+PROJECT"; }}
                     />
-                    
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2937] via-[#1F2937]/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
-                    
                     <div className="absolute bottom-0 left-0 p-10 md:p-16 text-left">
                       <div className="flex items-center gap-4 mb-4">
                         <span className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl border border-white/20">
@@ -481,6 +496,7 @@ export default function App() {
         </div>
       </footer>
 
+      {/* MODAL NETWORK CHECKER & CHATBOT TETAP SAMA */}
       <AnimatePresence>
         {showNetworkModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
@@ -567,18 +583,15 @@ export default function App() {
               <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-100 flex gap-2 bg-white">
                 <input 
                   type="text" value={inputChat} onChange={(e) => setInputChat(e.target.value)}
-                  placeholder="Masukkan kata..." 
-                  className="flex-1 bg-gray-100 px-4 py-2 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium"
+                  placeholder="Masukkan kata kunci..."
+                  className="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-purple-500"
                 />
-                <button type="submit" className="bg-[#1F2937] text-white px-4 py-2 text-xs rounded-xl font-bold hover:bg-black transition-all">
-                  Kirim
-                </button>
+                <button type="submit" className="bg-[#1F2937] text-white px-4 py-2 rounded-xl font-bold">Kirim</button>
               </form>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }
